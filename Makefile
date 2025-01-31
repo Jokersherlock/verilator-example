@@ -1,5 +1,5 @@
 # 顶层模块名称
-SELECT_MODULE ?= DspSimple
+SELECT_MODULE ?= test
 
 # 自动根据模块名称设置宏定义
 CFLAGS_MODULE = -DSELECT_MODULE_$(shell echo $(SELECT_MODULE) | tr 'a-z' 'A-Z')
@@ -15,6 +15,10 @@ WAVE_DIR = wave
 
 # Verilator
 VERILATOR = verilator
+
+# Verilator 选项（忽略警告导致的错误，但仍显示警告）
+VERILATOR_FLAGS = --timing --error-limit 0 \
+    --Wno-PINMISSING --Wno-WIDTHTRUNC --Wno-CASEINCOMPLETE --Wno-UNUSED
 
 # 递归搜索 Verilog 文件（包含子目录）
 VERILOG_FILES = $(shell find $(RTL_DIR) -type f -name "*.v")
@@ -42,7 +46,7 @@ $(OBJ_DIR)/V$(SELECT_MODULE): $(VERILOG_FILES) $(SIM_FILE) $(MAIN_FILE) | $(WAVE
 	$(VERILATOR) --cc $(VERILOG_FILES) --trace --exe $(MAIN_FILE) $(SIM_FILE) \
 	    -I$(INCLUDE_DIR) -CFLAGS "-I$(INCLUDE_DIR) $(CFLAGS_MODULE)" \
 	    -top-module $(SELECT_MODULE) \
-	    --Mdir $(OBJ_DIR)
+	    --Mdir $(OBJ_DIR) $(VERILATOR_FLAGS)  # 添加 VERILATOR_FLAGS
 	make -j -C $(OBJ_DIR) -f V$(SELECT_MODULE).mk V$(SELECT_MODULE)
 
 # 运行仿真
