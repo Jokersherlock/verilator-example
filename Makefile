@@ -1,5 +1,5 @@
 # 顶层模块名称
-SELECT_MODULE ?= test
+SELECT_MODULE ?= DspSimple
 
 # 自动根据模块名称设置宏定义
 CFLAGS_MODULE = -DSELECT_MODULE_$(shell echo $(SELECT_MODULE) | tr 'a-z' 'A-Z')
@@ -16,8 +16,8 @@ WAVE_DIR = wave
 # Verilator
 VERILATOR = verilator
 
-# 自动搜索 Verilog 文件
-VERILOG_FILES = $(wildcard $(RTL_DIR)/*.v)
+# 递归搜索 Verilog 文件（包含子目录）
+VERILOG_FILES = $(shell find $(RTL_DIR) -type f -name "*.v")
 
 # 动态匹配与 SELECT_MODULE 对应的仿真文件
 SIM_FILE = $(CPP_DIR)/tb_$(SELECT_MODULE).cpp
